@@ -1,6 +1,101 @@
-git clone https://github.com/USERNAME/memory-game.git
-cd memory-game
-cp index.html .
-git add .
-git commit -m "Initial memory game"
-git push
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Memory Flip Card Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 90px);
+      gap: 12px;
+    }
+
+    .card {
+      width: 90px;
+      height: 90px;
+      background: #444;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      user-select: none;
+      transform: scale(1);
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .card.flipped {
+      background: #fff;
+      color: #000;
+      cursor: default;
+    }
+
+    .card.matched {
+      background: #4caf50;
+      color: #fff;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-board" id="gameBoard"></div>
+
+  <script>
+    const symbols = ['🍎','🍌','🍇','🍓','🍒','🍍','🥝','🍑'];
+    const cards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+
+    const gameBoard = document.getElementById('gameBoard');
+    let firstCard = null;
+    let lockBoard = false;
+
+    cards.forEach(symbol => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.symbol = symbol;
+
+      card.addEventListener('click', () => {
+        if (lockBoard || card.classList.contains('flipped')) return;
+
+        card.textContent = symbol;
+        card.classList.add('flipped');
+
+        if (!firstCard) {
+          firstCard = card;
+        } else {
+          if (firstCard.dataset.symbol === symbol) {
+            firstCard.classList.add('matched');
+            card.classList.add('matched');
+            firstCard = null;
+          } else {
+            lockBoard = true;
+            setTimeout(() => {
+              firstCard.textContent = '';
+              card.textContent = '';
+              firstCard.classList.remove('flipped');
+              card.classList.remove('flipped');
+              firstCard = null;
+              lockBoard = false;
+            }, 800);
+          }
+        }
+      });
+
+      gameBoard.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>
